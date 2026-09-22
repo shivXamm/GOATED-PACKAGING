@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RE:FORM — PackSwitch Decision Engine</title>
+<meta name="description" content="A case-ready PackSwitch decision engine for requirement-led sustainable food delivery packaging.">
+<style>
+:root{
+  --bg:#f6f7f3;--panel:#ffffff;--ink:#14251b;--muted:#617068;--line:#dfe5df;
+  --brand:#0d7a4d;--brand2:#18a36a;--brand-soft:#e8f5ee;--warn:#9b6400;--warn-soft:#fff6df;
+  --danger:#b33a3a;--danger-soft:#fff0f0;--shadow:0 20px 50px rgba(19,45,31,.08);--radius:20px;
+  --navy:#172a3a;--navy2:#223b4f;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+button,input,select{font:inherit}
+button{cursor:pointer}
+a{color:inherit}
+.header{position:sticky;top:0;z-index:20;background:rgba(246,247,243,.93);backdrop-filter:blur(16px);border-bottom:1px solid rgba(223,229,223,.9)}
+.nav{max-width:1320px;margin:auto;display:flex;align-items:center;justify-content:space-between;padding:14px 22px}
+.brand{display:flex;gap:11px;align-items:center;font-weight:900;letter-spacing:.3px}
+.logo{width:38px;height:38px;border-radius:12px;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:900}
+.nav-actions{display:flex;gap:9px;align-items:center}
+.btn{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 14px;font-weight:800;color:var(--ink);transition:.15s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 10px 20px rgba(0,0,0,.06)}
+.btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+.btn.dark{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn.ghost{background:transparent}
+.btn.small{padding:8px 11px;font-size:13px}
+main{max-width:1320px;margin:auto;padding:32px 22px 72px}
+.hero{display:grid;grid-template-columns:1.5fr .9fr;gap:22px;align-items:stretch;margin-bottom:22px}
+.hero-card{background:linear-gradient(145deg,#10271c,#1a3b2a);color:#fff;border-radius:28px;padding:34px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.hero-card:after{content:"";position:absolute;right:-80px;top:-80px;width:260px;height:260px;border:1px solid rgba(255,255,255,.13);border-radius:50%;box-shadow:0 0 0 35px rgba(255,255,255,.04),0 0 0 70px rgba(255,255,255,.025)}
+.kicker{font-size:12px;letter-spacing:1.7px;text-transform:uppercase;font-weight:900;opacity:.7;margin-bottom:10px}
+h1{font-size:clamp(34px,4.3vw,62px);line-height:.98;margin:0 0 16px;max-width:780px;letter-spacing:-2px}
+.hero-card p{max-width:740px;color:#d8e7dc;font-size:17px;margin:0}
+.hero-side{background:#fff;border:1px solid var(--line);border-radius:28px;padding:24px;box-shadow:var(--shadow)}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:15px}
+.stat{background:var(--brand-soft);border-radius:16px;padding:15px}.stat b{display:block;font-size:25px}.stat span{font-size:12px;color:var(--muted);font-weight:700}
+.section{margin-top:22px}.section-head{display:flex;justify-content:space-between;gap:16px;align-items:end;margin-bottom:12px}.section-head h2{margin:0;font-size:24px;letter-spacing:-.5px}.section-head p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.workflow{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.step{background:#fff;border:1px solid var(--line);border-radius:18px;padding:15px;min-height:116px;position:relative}.step .n{font-size:12px;font-weight:900;color:var(--brand)}.step h3{font-size:14px;margin:7px 0 4px}.step p{font-size:12px;color:var(--muted);margin:0}
+.layout{display:grid;grid-template-columns:1.05fr .95fr;gap:22px;align-items:start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card-head{padding:22px 22px 0}.card-body{padding:22px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:flex;flex-direction:column;gap:7px}.field.full{grid-column:1/-1}.label{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.7px;color:#405048}
+input[type=text],input[type=number],select{width:100%;border:1px solid var(--line);background:#fbfcfb;border-radius:12px;padding:12px 13px;outline:none;color:var(--ink)}
+input:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(13,122,77,.10)}
+.pillbox{display:flex;flex-wrap:wrap;gap:8px}
+.pill{position:relative}.pill input{position:absolute;opacity:0;pointer-events:none}.pill span{display:block;border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 11px;font-size:12px;font-weight:800;cursor:pointer;transition:.12s}.pill input:checked+span{background:var(--ink);color:#fff;border-color:var(--ink)}
+.slider-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}.range{width:100%}.range-value{min-width:64px;text-align:right;font-weight:900}
+.note{padding:12px 14px;border-radius:14px;background:var(--warn-soft);color:#744a00;font-size:12px;margin-top:14px;border:1px solid #f0dfb8}
+.checkgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.check{display:flex;gap:9px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px;font-size:12px;font-weight:800;background:#fff}.check input{accent-color:var(--brand)}
+.actions{display:flex;gap:9px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+.result-empty{padding:38px 24px;text-align:center;color:var(--muted)}
+.result{display:none}.result.show{display:block}
+.rank-banner{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:22px;background:linear-gradient(135deg,var(--brand-soft),#fff);border-bottom:1px solid var(--line)}
+.rank-title{font-size:14px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--brand)}.rank-material{font-size:31px;font-weight:950;letter-spacing:-1px;margin:4px 0}.rank-reason{color:var(--muted);font-size:13px;max-width:650px}.fit-badge{min-width:92px;height:92px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:#fff;text-align:center}.fit-badge b{font-size:25px;line-height:1}.fit-badge small{font-size:9px;letter-spacing:1px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:15px 0}.metric{border:1px solid var(--line);border-radius:14px;padding:13px;background:#fff}.metric .m-top{display:flex;justify-content:space-between;font-size:12px;font-weight:900}.bar{height:7px;background:#edf1ed;border-radius:99px;overflow:hidden;margin-top:9px}.bar i{display:block;height:100%;background:var(--brand);border-radius:99px}.metric small{display:block;color:var(--muted);font-size:10px;margin-top:6px}
+.result-list{padding:18px 22px 22px}.result-list h4,.subhead{margin:0 0 10px;font-size:14px}.candidate{border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:10px;background:#fff}.candidate:last-child{margin-bottom:0}.cand-top{display:flex;justify-content:space-between;gap:12px;align-items:center}.cand-name{font-weight:900}.score{font-size:13px;font-weight:950}.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}.tag{border-radius:999px;padding:6px 8px;background:#f3f6f3;font-size:10px;font-weight:800;color:#435048}.tag.good{background:var(--brand-soft);color:var(--brand)}.tag.warn{background:var(--warn-soft);color:var(--warn)}.tag.bad{background:var(--danger-soft);color:var(--danger)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}.mini-list{display:grid;gap:8px}.mini-row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line);font-size:12px}.mini-row:last-child{border-bottom:0}.mini-row span{color:var(--muted)}
+.case-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.case-item{border:1px solid var(--line);border-radius:15px;padding:14px;background:#fff}.case-item strong{display:block;margin-bottom:4px;font-size:13px}.case-item span{font-size:12px;color:var(--muted)}.pass{color:var(--brand);font-weight:900}.pending{color:var(--warn);font-weight:900}
+.catalog{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.material-card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:15px}.mat-top{display:flex;justify-content:space-between;gap:8px}.mat-name{font-weight:900}.mat-type{font-size:10px;color:var(--muted);font-weight:800}.mat-card p{font-size:11px;color:var(--muted);margin:8px 0}.mat-flags{display:flex;flex-wrap:wrap;gap:5px}.mat-flags span{font-size:9px;background:var(--brand-soft);color:var(--brand);padding:5px 7px;border-radius:999px;font-weight:800}.disabled-card{opacity:.72}
+.footer-note{font-size:11px;color:var(--muted);line-height:1.55}.source-list{display:grid;gap:10px}.source{border:1px solid var(--line);border-radius:14px;padding:12px}.source b{display:block;font-size:12px}.source a{font-size:11px;color:var(--brand);word-break:break-all}.modal{display:none;position:fixed;inset:0;z-index:50;background:rgba(9,18,14,.48);align-items:center;justify-content:center;padding:20px}.modal.show{display:flex}.modal-card{width:min(850px,100%);max-height:88vh;overflow:auto;background:#fff;border-radius:24px;border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.25)}.modal-head{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff}.modal-head h3{margin:0}.modal-body{padding:20px}
+.toast{position:fixed;right:18px;bottom:18px;background:var(--ink);color:#fff;border-radius:12px;padding:12px 15px;font-size:12px;font-weight:800;display:none;z-index:60}.toast.show{display:block}
+@media(max-width:1100px){.hero,.layout{grid-template-columns:1fr}.workflow{grid-template-columns:repeat(3,1fr)}.catalog{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px){main{padding-left:13px;padding-right:13px}.nav{padding:12px 13px}.nav-actions .btn.ghost{display:none}.workflow,.form-grid,.two-col,.case-grid{grid-template-columns:1fr}.catalog{grid-template-columns:1fr 1fr}.checkgrid{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}.hero-card,.hero-side{padding:23px}.rank-banner{flex-direction:column}.fit-badge{width:84px;height:84px}.stat-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header class="header">
+  <nav class="nav">
+    <div class="brand"><div class="logo">R</div><div>RE:FORM <span style="font-size:10px;color:var(--muted);font-weight:800">× PACKSWITCH</span></div></div>
+    <div class="nav-actions">
+      <button class="btn ghost small" id="sourcesBtn">Sources & assumptions</button>
+      <button class="btn dark small" id="printBtn">Print brief</button>
+    </div>
+  </nav>
+</header>
+<main>
+<section class="hero">
+  <div class="hero-card">
+    <div class="kicker">The Meal Serve · ComQuest ’26-27</div>
+    <h1>From “sustainable” to <em>fit-for-food</em>.</h1>
+    <p>A PackSwitch-powered decision engine that matches each dish to a sustainable packaging solution using functional needs, cost, customer experience and operational constraints — then validates it before scaling.</p>
+    <div style="margin-top:20px;display:flex;gap:9px;flex-wrap:wrap">
+      <span class="tag" style="background:rgba(255,255,255,.12);color:#fff">Requirement-led</span>
+      <span class="tag" style="background:rgba(255,255,255,.12);color:#fff">Cost-gated</span>
+      <span class="tag" style="background:rgba(255,255,255,.12);color:#fff">Pilot → feedback → scale</span>
+    </div>
+  </div>
+  <div class="hero-side">
+    <div class="kicker" style="color:var(--muted)">Case anchors</div>
+    <h2 style="margin:0;font-size:23px">What the brief forces us to balance</h2>
+    <div class="stat-grid">
+      <div class="stat"><b>₹5</b><span>ideal max incremental cost / order</span></div>
+      <div class="stat"><b>30–45m</b><span>typical food delivery journey</span></div>
+      <div class="stat"><b>100+</b><span>The Meal Serve outlets</span></div>
+      <div class="stat"><b>7</b><span>PackSwitch material categories</span></div>
+    </div>
+    <div class="note">Prototype note: PackSwitch publishes fit/performance and supplier information publicly; it does not expose a public price list in the sources used here. Candidate costs below are clearly labelled illustrative demo assumptions.</div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head"><div><h2>The decision loop</h2><p>Every box is a business decision, not a material swap.</p></div></div>
+  <div class="workflow">
+    <div class="step"><div class="n">01</div><h3>SELECT DISH</h3><p>Biryani, thali, fried food, dessert, beverage, condiment…</p></div>
+    <div class="step"><div class="n">02</div><h3>DIAGNOSE</h3><p>Pick the functional problems that actually matter in delivery.</p></div>
+    <div class="step"><div class="n">03</div><h3>CONSTRAIN</h3><p>Set cost ceiling, delivery time and operational requirements.</p></div>
+    <div class="step"><div class="n">04</div><h3>MATCH</h3><p>Rank sustainable PackSwitch material options by weighted fit.</p></div>
+    <div class="step"><div class="n">05</div><h3>PILOT</h3><p>Test representative outlets before network-wide transition.</p></div>
+    <div class="step"><div class="n">06</div><h3>SCALE</h3><p>Use actual customer + outlet data to approve rollout.</p></div>
+  </div>
+</section>
+
+<section class="section layout" id="engine">
+  <div class="card">
+    <div class="card-head"><div class="kicker" style="color:var(--brand)">01 · Configure the problem</div><h2 style="margin:0">Packaging diagnostic</h2><p style="margin:4px 0 0;color:var(--muted);font-size:13px">This is the input layer for the decision engine.</p></div>
+    <div class="card-body">
+      <div class="form-grid">
+        <div class="field">
+          <label class="label" for="dish">Dish</label>
+          <select id="dish"></select>
+        </div>
+        <div class="field">
+          <label class="label" for="customDish">Or enter custom dish</label>
+          <input id="customDish" type="text" placeholder="e.g., paneer tikka wrap">
+        </div>
+        <div class="field full">
+          <label class="label">Functional problems / requirements <span style="color:var(--muted);font-weight:700;text-transform:none;letter-spacing:0">(select all relevant)</span></label>
+          <div id="issuePills" class="pillbox"></div>
+        </div>
+        <div class="field">
+          <label class="label" for="currentCost">Current packaging cost / order (₹)</label>
+          <input id="currentCost" type="number" min="0" step="0.5" value="8">
+        </div>
+        <div class="field">
+          <label class="label" for="maxIncrement">Maximum acceptable incremental cost (₹)</label>
+          <input id="maxIncrement" type="number" min="0" step="0.5" value="5">
+        </div>
+        <div class="field">
+          <label class="label" for="deliveryTime">Expected delivery time</label>
+          <select id="deliveryTime">
+            <option value="30">30 min</option><option value="38" selected>38 min</option><option value="45">45 min</option><option value="50">50+ min (stress test)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="label" for="outlets">Pilot outlets</label>
+          <input id="outlets" type="number" min="1" max="20" value="4">
+        </div>
+        <div class="field full">
+          <label class="label">Operational constraints</label>
+          <div class="checkgrid">
+            <label class="check"><input type="checkbox" checked data-op="stackability"> Easy storage & stackability</label>
+            <label class="check"><input type="checkbox" checked data-op="refrigeration"> Refrigeration compatibility</label>
+            <label class="check"><input type="checkbox" checked data-op="packing"> Fast / simple packing workflow</label>
+            <label class="check"><input type="checkbox" checked data-op="supplier"> Supplier availability / sourcing feasibility</label>
+          </div>
+        </div>
+        <div class="field full">
+          <label class="label">Decision weights</label>
+          <div class="two-col" style="grid-template-columns:1fr 1fr">
+            <div><div class="slider-row"><span style="font-size:12px;font-weight:800">Food function</span><span class="range-value" id="wFunctionVal">35%</span></div><input id="wFunction" class="range" type="range" min="20" max="50" value="35"></div>
+            <div><div class="slider-row"><span style="font-size:12px;font-weight:800">Sustainability</span><span class="range-value" id="wSustainVal">20%</span></div><input id="wSustain" class="range" type="range" min="10" max="30" value="20"></div>
+            <div><div class="slider-row"><span style="font-size:12px;font-weight:800">Customer experience</span><span class="range-value" id="wCustomerVal">20%</span></div><input id="wCustomer" class="range" type="range" min="10" max="30" value="20"></div>
+            <div><div class="slider-row"><span style="font-size:12px;font-weight:800">Operations</span><span class="range-value" id="wOpsVal">15%</span></div><input id="wOps" class="range" type="range" min="5" max="25" value="15"></div>
+            <div><div class="slider-row"><span style="font-size:12px;font-weight:800">Cost</span><span class="range-value" id="wCostVal">10%</span></div><input id="wCost" class="range" type="range" min="5" max="20" value="10"></div>
+          </div>
+          <div class="footer-note" style="margin-top:8px">The engine auto-normalises these five weights to 100%. They are strategic-model assumptions, not PackSwitch proprietary weights.</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="resetBtn">Reset</button>
+        <button class="btn primary" id="runBtn">Run PackSwitch Fit Analysis →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="resultCard">
+    <div id="emptyState" class="result-empty"><div style="font-size:38px">⌁</div><h3 style="margin:10px 0 5px;color:var(--ink)">Your packaging recommendation will appear here</h3><p style="font-size:13px;margin:0 auto;max-width:400px">Choose a dish, select the functional problems, set the ₹5-style budget ceiling and run the analysis.</p></div>
+    <div id="result" class="result"></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head"><div><h2>PackSwitch material catalog used in the engine</h2><p>Evidence-backed attributes are derived from PackSwitch material profiles. Moulded fibre is shown as a catalog category but is held out of scoring until its live profile is validated.</p></div></div>
+  <div class="catalog" id="catalog"></div>
+</section>
+
+<section class="section two-col">
+  <div class="card"><div class="card-body"><div class="kicker" style="color:var(--brand)">Case fit</div><h2 style="margin:0 0 13px">Why this does not go out of context</h2><div class="case-grid" id="caseFit"></div></div></div>
+  <div class="card"><div class="card-body"><div class="kicker" style="color:var(--brand)">Implementation</div><h2 style="margin:0 0 13px">Pilot → data → scale</h2><div class="mini-list">
+    <div class="mini-row"><span>1. Select pilot outlets</span><strong id="pilotText">4 outlets</strong></div>
+    <div class="mini-row"><span>2. Run controlled A/B comparison</span><strong>Current vs recommended</strong></div>
+    <div class="mini-row"><span>3. Measure</span><strong>Leakage · food quality · cost · packing time · CX</strong></div>
+    <div class="mini-row"><span>4. Decision gate</span><strong>Meets functional + cost + ops thresholds</strong></div>
+    <div class="mini-row"><span>5. Scale</span><strong>Successful configuration → wider outlet rollout</strong></div>
+  </div></div></div>
+</section>
+
+<section class="section">
+  <div class="card"><div class="card-body">
+    <div class="section-head" style="align-items:center"><div><div class="kicker" style="color:var(--brand)">Pilot feedback loop</div><h2>Turn the recommendation into evidence</h2><p>Enter pilot results to calculate whether the chosen solution is ready for scale. Thresholds here are illustrative strategy-model assumptions.</p></div><button class="btn small" id="demoPilotBtn">Load demo pilot</button></div>
+    <div class="form-grid">
+      <div class="field"><label class="label">Leakage rate (%)</label><input id="pLeak" type="number" min="0" max="100" step="0.1" value="1.8"></div>
+      <div class="field"><label class="label">Food-quality complaints (%)</label><input id="pQuality" type="number" min="0" max="100" step="0.1" value="2.5"></div>
+      <div class="field"><label class="label">Packing time / order (sec)</label><input id="pTime" type="number" min="0" step="1" value="32"></div>
+      <div class="field"><label class="label">Customer satisfaction (1–5)</label><input id="pCx" type="number" min="1" max="5" step="0.1" value="4.3"></div>
+      <div class="field"><label class="label">Actual incremental cost / order (₹)</label><input id="pCost" type="number" min="0" step="0.1" value="3.6"></div>
+      <div class="field"><label class="label">Pilot orders</label><input id="pOrders" type="number" min="1" step="1" value="500"></div>
+    </div>
+    <div class="actions"><button class="btn primary" id="evaluatePilotBtn">Evaluate scale readiness →</button></div>
+    <div id="pilotResult" style="margin-top:16px"></div>
+  </div></div>
+</section>
+
+<section class="section">
+  <div class="footer-note"><b>What this prototype is / is not:</b> This is a competition-ready decision-engine prototype. It uses public PackSwitch dish/material descriptions and the case brief as the evidence layer. Its weighted fit score, pilot gates and demo costs are our strategic modelling choices for the prototype. Replace the demo cost assumptions with actual supplier quotes from PackSwitch before real procurement.</div>
+</section>
+</main>
+
+<div class="modal" id="sourcesModal">
+  <div class="modal-card">
+    <div class="modal-head"><h3>Sources & assumptions</h3><button class="btn small" id="closeModal">Close</button></div>
+    <div class="modal-body">
+      <div class="source-list">
+        <div class="source"><b>Case PDF — ComQuest’26-27 / RE:FORM Round 2</b><span style="font-size:11px;color:var(--muted)">Used for the business context, ₹5 incremental-cost target, 30–45 minute delivery time, 100+ outlets, menu categories, functional requirements and deliverable framing.</span><a href="https://example.invalid/case-pdf" onclick="return false">Local attachment supplied in this competition task</a></div>
+        <div class="source"><b>PackSwitch by Zomato — main site</b><a href="https://www.zomato.com/packswitch/" target="_blank">https://www.zomato.com/packswitch/</a><span style="display:block;font-size:11px;color:var(--muted)">Public site states restaurants can search dishes, find sustainable packaging and explore suppliers. It also reports 7 material categories and 50+ dishes on the current site.</span></div>
+        <div class="source"><b>PackSwitch — About</b><a href="https://www.zomato.com/packswitch/about/" target="_blank">https://www.zomato.com/packswitch/about/</a><span style="display:block;font-size:11px;color:var(--muted)">Current public page reports 100+ verified suppliers and 10,000+ restaurants participating in the broader low-plastic packaging effort.</span></div>
+        <div class="source"><b>PackSwitch — supplier list</b><a href="https://www.zomato.com/packswitch/supplier-list/" target="_blank">https://www.zomato.com/packswitch/supplier-list/</a><span style="display:block;font-size:11px;color:var(--muted)">Public supplier directory used only as the sourcing path; supplier pricing is not treated as publicly verified here.</span></div>
+        <div class="source"><b>PackSwitch — material profiles</b><a href="https://www.zomato.com/packswitch/materials/bagasse/" target="_blank">Bagasse</a> · <a href="https://www.zomato.com/packswitch/materials/paper/" target="_blank">Paper</a> · <a href="https://www.zomato.com/packswitch/materials/areca/" target="_blank">Areca</a> · <a href="https://www.zomato.com/packswitch/materials/aluminum/" target="_blank">Aluminum</a> · <a href="https://www.zomato.com/packswitch/materials/glass/" target="_blank">Glass</a> · <a href="https://www.zomato.com/packswitch/materials/earthenware/" target="_blank">Earthenware</a> · <a href="https://www.zomato.com/packswitch/materials/compostable-plastic/" target="_blank">Compostable plastic</a></div>
+        <div class="source"><b>PackSwitch — dish examples used for the rule layer</b><a href="https://www.zomato.com/packswitch/dishes/thali-meals/" target="_blank">Thali & Meals</a> · <a href="https://www.zomato.com/packswitch/dishes/taco-quesadilla/" target="_blank">Taco & Quesadilla</a> · <a href="https://www.zomato.com/packswitch/dishes/momo-dimsums/" target="_blank">Momo & Dimsums</a> · <a href="https://www.zomato.com/packswitch/dishes/dry-mithai/" target="_blank">Dry Mithai</a> · <a href="https://www.zomato.com/packswitch/dishes/mithai-with-chashni/" target="_blank">Mithai with Chashni</a> · <a href="https://www.zomato.com/packswitch/dishes/hot-coffee/" target="_blank">Hot Coffee</a> · <a href="https://www.zomato.com/packswitch/dishes/mocktails/" target="_blank">Mocktails</a> · <a href="https://www.zomato.com/packswitch/dishes/pizza/" target="_blank">Pizza</a> · <a href="https://www.zomato.com/packswitch/dishes/soy-sauce-and-chilli-oil/" target="_blank">Soy Sauce & Chilli Oil</a></div>
+        <div class="source"><b>External context used</b><a href="https://www.zomato.com/blog/making-sustainable-packaging-simpler-for-restaurants/" target="_blank">Zomato blog — Making sustainable packaging simpler for restaurants (18 Aug 2026)</a><span style="display:block;font-size:11px;color:var(--muted)">Explains PackSwitch’s three-step flow: choose dish → explore suitable materials → connect with verified suppliers, and reiterates that different foods have different packaging needs.</span></div>
+      </div>
+      <div class="note" style="margin-top:14px"><b>Important:</b> The fit score is not an official PackSwitch/Zomato score. It is a transparent prototype model that converts PackSwitch-published performance attributes into a business decision. Demonstration costs are not PackSwitch prices.</div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast">Saved</div>
+
+<script>
+const MATERIALS={
+  paper:{name:'Paper',slug:'paper',sustain:4,perf:{heat:4,grease:4,leak:4,impact:4,stack:5,branding:5},best:'Hot/cold beverages, oily & dry foods, curries, desserts, condiments',notes:'PE coatings can reduce recyclability; water/plant-based coatings can be used as alternatives.',demoCost:2.2,scorable:true},
+  bagasse:{name:'Bagasse',slug:'bagasse',sustain:5,perf:{heat:5,grease:5,leak:5,impact:5,stack:5,branding:3},best:'Hot/cold beverages, oily & dry foods, curries, desserts, condiments',notes:'Naturally insulating; can use plant-based/water-based/biopolymer coatings.',demoCost:3.6,scorable:true},
+  areca:{name:'Areca',slug:'areca',sustain:5,perf:{heat:4,grease:5,leak:5,impact:5,stack:5,branding:3},best:'Oily & dry foods, curries, desserts, condiments',notes:'Home compostable. PackSwitch notes limited supplier availability and cool/dry storage needs.',demoCost:4.2,scorable:true},
+  aluminum:{name:'Aluminum',slug:'aluminum',sustain:4,perf:{heat:5,grease:5,leak:5,impact:4,stack:5,branding:5},best:'Hot beverages, oily & dry foods, curries, desserts',notes:'Recyclable. PackSwitch notes it is not microwave-safe and can be impacted under heavy loads.',demoCost:4.8,scorable:true},
+  glass:{name:'Glass',slug:'glass',sustain:4,perf:{heat:5,grease:5,leak:5,impact:2,stack:4,branding:5},best:'Cold beverages, oily & dry foods, curries, desserts, condiments',notes:'Reusable and highly recyclable; heavier and fragile vs most packaging.',demoCost:6.5,scorable:true},
+  earthenware:{name:'Earthenware',slug:'earthenware',sustain:5,perf:{heat:5,grease:5,leak:5,impact:2,stack:4,branding:3},best:'Oily & dry dishes, curries, traditional desserts',notes:'Reusable; aroma-friendly, but heavy and fragile with limited branding flexibility.',demoCost:7.0,scorable:true},
+  compostable_plastic:{name:'Compostable plastic',slug:'compostable-plastic',sustain:4,perf:{heat:5,grease:5,leak:5,impact:5,stack:5,branding:3},best:'Cold beverages, oily & dry foods, curries, desserts, condiments',notes:'Industrially compostable. Not all variants are microwave-safe; PackSwitch advises avoiding acidic/carbonated items like fizzy drinks.',demoCost:4.6,scorable:true},
+  moulded_fiber:{name:'Moulded fiber',slug:'moulded-fiber',sustain:5,perf:{heat:null,grease:null,leak:null,impact:null,stack:null,branding:null},best:'PackSwitch catalog material',notes:'Catalogued by PackSwitch in the case brief. Hold out of the score until its live material profile is verified.',demoCost:3.4,scorable:false}
+};
+
+const ISSUES={
+  heat:{label:'Heat retention',key:'heat',weight:1.0},
+  steam:{label:'Steam management',key:'heat',weight:.8},
+  aroma:{label:'Aroma retention',key:'aroma',weight:1.0},
+  leakage:{label:'Leakage / spillage',key:'leak',weight:1.2},
+  grease:{label:'Oil & grease resistance',key:'grease',weight:1.0},
+  crispiness:{label:'Crispiness',key:'crisp',weight:1.1},
+  moisture:{label:'Moisture retention',key:'moist',weight:.9},
+  presentation:{label:'Presentation / structure',key:'impact',weight:.7}
+};
+
+const DISHES={
+  biryani:{name:'Biryani · case profile',source:'Case brief',issues:['heat','steam','aroma','leakage','crispiness'],note:'Case-defined: manage steam while retaining aroma and keeping food intact through 30–45 min delivery.'},
+  thali:{name:'Thali & Meals',source:'PackSwitch',issues:['heat','grease','leakage','aroma'],note:'PackSwitch lists keeping food warm, resisting oil & grease, preventing spillage and retaining aroma.'},
+  taco:{name:'Taco & Quesadilla',source:'PackSwitch',issues:['heat','grease','leakage','crispiness'],note:'PackSwitch lists keeping food warm, resisting oil & grease, preventing spillage and preserving crispiness.'},
+  momo:{name:'Momo & Dimsums',source:'PackSwitch',issues:['heat','grease','leakage','moisture'],note:'PackSwitch lists keeping food warm, resisting oil & grease, preventing spillage and retaining moisture.'},
+  burrito:{name:'Burrito Bowl',source:'PackSwitch',issues:['grease','leakage','moisture','aroma'],note:'PackSwitch lists resisting oil & grease, preventing spillage, retaining moisture and retaining aroma.'},
+  drymithai:{name:'Dry Mithai',source:'PackSwitch',issues:['grease','moisture','aroma'],note:'PackSwitch lists resisting oil & grease, retaining moisture and retaining aroma.'},
+  chashni:{name:'Mithai with Chashni',source:'PackSwitch',issues:['leakage','moisture','aroma'],note:'PackSwitch lists preventing spillage, retaining moisture and retaining aroma.'},
+  icecream:{name:'Ice Cream & Gelato',source:'PackSwitch',issues:['leakage'],note:'PackSwitch lists preventing spillage.'},
+  coffee:{name:'Hot Coffee',source:'PackSwitch',issues:['heat','leakage','aroma'],note:'PackSwitch lists keeping food warm, preventing spillage and retaining aroma.'},
+  mocktails:{name:'Mocktails',source:'PackSwitch',issues:['leakage','aroma'],note:'PackSwitch lists preventing spillage and retaining aroma.'},
+  pizza:{name:'Pizza',source:'PackSwitch',issues:['heat','grease','crispiness'],note:'PackSwitch lists keeping food warm, resisting oil & grease and preserving crispiness.'},
+  condiment:{name:'Soy Sauce & Chilli Oil',source:'PackSwitch',issues:['grease','leakage','aroma'],note:'PackSwitch lists resisting oil & grease, preventing spillage and retaining aroma.'}
+};
+
+const dishEl=document.getElementById('dish');
+for(const [k,v] of Object.entries(DISHES)){const o=document.createElement('option');o.value=k;o.textContent=v.name;dishEl.appendChild(o)}
+const issuePills=document.getElementById('issuePills');
+function renderIssues(keys){issuePills.innerHTML=''; const selected=new Set(keys);
+  for(const [k,v] of Object.entries(ISSUES)){const lab=document.createElement('label');lab.className='pill';lab.innerHTML=`<input type="checkbox" data-issue="${k}" ${selected.has(k)?'checked':''}><span>${v.label}</span>`;issuePills.appendChild(lab)}
+}
+renderIssues(DISHES.biryani.issues);
+
+dishEl.addEventListener('change',()=>{const d=DISHES[dishEl.value]; renderIssues(d.issues); flash(`Loaded ${d.name}`)});
+
+document.getElementById('customDish').addEventListener('input',e=>{if(e.target.value.trim()) flash('Custom dish active — selected issues remain the rule layer')});
+
+function pct(n){return Math.max(0,Math.min(100,Math.round(n)))}
+function normalizeWeights(){
+  const raw=['wFunction','wSustain','wCustomer','wOps','wCost'].map(id=>+document.getElementById(id).value);
+  const total=raw.reduce((a,b)=>a+b,0); return {function:raw[0]/total,sustain:raw[1]/total,customer:raw[2]/total,ops:raw[3]/total,cost:raw[4]/total};
+}
+function bindWeight(id,valId){const el=document.getElementById(id),out=document.getElementById(valId); const f=()=>out.textContent=el.value+'%'; el.addEventListener('input',f);f()}
+bindWeight('wFunction','wFunctionVal');bindWeight('wSustain','wSustainVal');bindWeight('wCustomer','wCustomerVal');bindWeight('wOps','wOpsVal');bindWeight('wCost','wCostVal');
+
+function getSelectedIssues(){return [...document.querySelectorAll('[data-issue]:checked')].map(x=>x.dataset.issue)}
+function opRequirements(){return [...document.querySelectorAll('[data-op]:checked')].map(x=>x.dataset.op)}
+function materialFunctional(material,selected,delivery){
+  if(!selected.length) return 45;
+  let total=0,got=0;
+  for(const key of selected){const issue=ISSUES[key];total+=issue.weight;
+    let s=3;
+    if(issue.key==='aroma') s=(material.name==='Earthenware'?5:(material.name==='Paper'?3.5:4));
+    else if(issue.key==='crisp') s=(material.name==='Paper'?5:(material.name==='Aluminum'||material.name==='Areca'||material.name==='Bagasse'?4:3));
+    else if(issue.key==='moist') s=(material.name==='Compostable plastic'||material.name==='Bagasse'?5:(material.name==='Areca'?4:3.5));
+    else s=material.perf[issue.key]||3;
+    // Stress test for longer delivery: reward proven heat/leak performance, but do not invent exact thermal data.
+    if(delivery>45 && issue.key==='heat' && s>=4) s=Math.min(5,s+.2);
+    got+=s*issue.weight;
+  }
+  return (got/(total*5))*100;
+}
+function customerScore(material,selected){
+  let base=70;
+  if(selected.includes('leakage')) base += material.perf.leak*4;
+  if(selected.includes('heat')) base += material.perf.heat*3;
+  if(selected.includes('aroma')) base += material.name==='Earthenware'?8:3;
+  if(selected.includes('crispiness')) base += material.name==='Paper'?7:4;
+  if(selected.includes('presentation')) base += (material.perf.branding||3)*2;
+  if(material.name==='Glass' || material.name==='Earthenware') base-=6; // handling/weight friction, model assumption
+  return Math.min(100,base);
+}
+function opsScore(material,reqs){
+  let s=70;
+  if(reqs.includes('stackability')) s += (material.perf.stack||3)*5;
+  if(reqs.includes('refrigeration')) {
+    if(material.name==='Aluminum') s-=5; else s += 10;
+  }
+  if(reqs.includes('packing')) {
+    if(['Glass','Earthenware'].includes(material.name)) s-=12;
+    else s += 8;
+  }
+  if(reqs.includes('supplier')) {
+    if(material.name==='Areca') s-=7; else s += 5;
+  }
+  if(material.name==='Glass') s-=10;
+  if(material.name==='Earthenware') s-=10;
+  return Math.max(0,Math.min(100,s));
+}
+function costScore(material,maxInc){return maxInc<=0?0:Math.max(0,Math.min(100,(1-Math.max(0,material.demoCost-maxInc)/(maxInc*1.5))*100))}
+function candidateReason(m,selected){
+  const hits=[]; if(selected.includes('heat')||selected.includes('steam')) hits.push('heat performance'); if(selected.includes('leakage')) hits.push('leak resistance'); if(selected.includes('grease')) hits.push('oil/grease resistance'); if(selected.includes('aroma') && m.name==='Earthenware') hits.push('aroma retention'); if(selected.includes('crispiness') && m.name==='Paper') hits.push('crispiness support'); return hits.slice(0,3).join(' · ')||'balanced baseline';
+}
+function scoreMaterial(m,selected,weights,maxInc,delivery,reqs){
+  const f=materialFunctional(m,selected,delivery), su=m.sustain/5*100, cu=customerScore(m,selected), op=opsScore(m,reqs), co=costScore(m,maxInc);
+  const total=f*weights.function+su*weights.sustain+cu*weights.customer+op*weights.ops+co*weights.cost;
+  return {m,f,su,cu,op,co,total,withinBudget:m.demoCost<=maxInc,reason:candidateReason(m,selected)};
+}
+function chooseRecommendation(results){
+  const feasible=results.filter(r=>r.withinBudget);
+  const pool=feasible.length?feasible:results;
+  return [...pool].sort((a,b)=>b.total-a.total)[0];
+}
+function renderResult(chosen,results,selected,maxInc,currentCost,delivery,reqs,dish){
+  const result=document.getElementById('result'), empty=document.getElementById('emptyState');empty.style.display='none';result.classList.add('show');
+  const ranked=[...results].sort((a,b)=>b.total-a.total);
+  const topReason=chosen.withinBudget?'Within the stated incremental-cost ceiling and the strongest weighted fit in this model.':'No scored option is within the stated ceiling; this is the best fit, but requires supplier-quote validation or a higher budget ceiling.';
+  result.innerHTML=`
+  <div class="rank-banner"><div><div class="rank-title">Recommended fit</div><div class="rank-material">${chosen.m.name}</div><div class="rank-reason">${topReason} <strong>${dish.source==='PackSwitch'?'Based on PackSwitch dish/material evidence.':'Uses the case-defined Biryani requirement profile plus PackSwitch material evidence.'}</strong></div><div class="tags" style="margin-top:10px"><span class="tag good">${chosen.withinBudget?'Budget fit':'Budget exception'}</span><span class="tag">Illustrative demo cost +₹${chosen.m.demoCost.toFixed(1)}</span><span class="tag">Current ₹${currentCost.toFixed(1)} → demo total ₹${(currentCost+chosen.m.demoCost).toFixed(1)}</span></div></div><div class="fit-badge"><div><b>${pct(chosen.total)}</b><small>FIT / 100</small></div></div></div>
+  <div class="card-body" style="padding-bottom:10px"><div class="metrics">
+    ${metric('Function',chosen.f,'delivery requirements')}${metric('Sustainability',chosen.su,'model proxy')}${metric('Customer',chosen.cu,'food + handling')}${metric('Operations',chosen.op,'outlet feasibility')}
+  </div>
+  <div class="two-col"><div><h4 class="subhead">Why this fit?</h4><div class="mini-list"><div class="mini-row"><span>Selected needs</span><strong>${selected.length?selected.map(k=>ISSUES[k].label).join(', '):'None selected'}</strong></div><div class="mini-row"><span>Delivery stress</span><strong>${delivery} min</strong></div><div class="mini-row"><span>Ops constraints</span><strong>${reqs.length?reqs.length+' active':'None'}</strong></div><div class="mini-row"><span>Supplier path</span><strong>PackSwitch verified supplier directory</strong></div></div></div><div><h4 class="subhead">Recommended action</h4><div class="note" style="margin-top:0;background:var(--brand-soft);color:var(--ink);border-color:#cfe8db"><b>Do not roll out immediately.</b><br>Run the selected configuration in ${document.getElementById('outlets').value} pilot outlets, collect functional + customer + operations data, then scale only if it passes the agreed gate.</div></div></div></div>
+  <div class="result-list"><h4>Top alternatives</h4>${ranked.slice(0,4).map((r,i)=>candidateCard(r,i)).join('')}</div>`;
+  function metric(name,val,sub){return `<div class="metric"><div class="m-top"><span>${name}</span><span>${pct(val)}</span></div><div class="bar"><i style="width:${pct(val)}%"></i></div><small>${sub}</small></div>`}
+  function candidateCard(r,i){const budget=r.withinBudget?'<span class="tag good">within budget</span>':'<span class="tag bad">over budget</span>';return `<div class="candidate"><div class="cand-top"><div><div class="cand-name">${i+1}. ${r.m.name}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${r.m.best}</div></div><div class="score">${pct(r.total)}/100</div></div><div class="tags"><span class="tag">Function ${pct(r.f)}</span><span class="tag">Ops ${pct(r.op)}</span><span class="tag">CX ${pct(r.cu)}</span><span class="tag">Demo +₹${r.m.demoCost.toFixed(1)}</span>${budget}</div><div class="footer-note" style="margin-top:8px">${r.reason}. ${r.m.notes}</div></div>`}
+}
+
+function run(){
+  const selected=getSelectedIssues(), maxInc=+document.getElementById('maxIncrement').value||0,currentCost=+document.getElementById('currentCost').value||0,delivery=+document.getElementById('deliveryTime').value,reqs=opRequirements();
+  const d=DISHES[dishEl.value]; const custom=document.getElementById('customDish').value.trim();
+  const dish={...d,name:custom?`${custom} · custom profile`:d.name};
+  const weights=normalizeWeights();
+  const results=Object.values(MATERIALS).filter(m=>m.scorable).map(m=>scoreMaterial(m,selected,weights,maxInc,delivery,reqs));
+  const chosen=chooseRecommendation(results); renderResult(chosen,results,selected,maxInc,currentCost,delivery,reqs,dish); document.getElementById('pilotText').textContent=(document.getElementById('outlets').value||4)+' outlets';
+  flash(`Analysis complete · ${chosen.m.name}`); window.__last={chosen,results,dish,selected,maxInc,currentCost,delivery,reqs};
+}
+
+document.getElementById('runBtn').addEventListener('click',run);
+
+document.getElementById('resetBtn').addEventListener('click',()=>{document.getElementById('dish').value='biryani';document.getElementById('customDish').value='';document.getElementById('currentCost').value=8;document.getElementById('maxIncrement').value=5;document.getElementById('deliveryTime').value=38;document.getElementById('outlets').value=4;renderIssues(DISHES.biryani.issues);document.querySelectorAll('[data-op]').forEach(x=>x.checked=true);document.getElementById('result').innerHTML='';document.getElementById('result').classList.remove('show');document.getElementById('emptyState').style.display='block';document.getElementById('pilotResult').innerHTML='';window.__last=null;flash('Reset complete')});
+
+function renderCatalog(){const el=document.getElementById('catalog'); el.innerHTML=''; for(const m of Object.values(MATERIALS)){const c=document.createElement('div');c.className='material-card'+(!m.scorable?' disabled-card':'');c.innerHTML=`<div class="mat-top"><div class="mat-name">${m.name}</div><div class="mat-type">${m.scorable?'SCORED':'VALIDATE'}</div></div><p>${m.best}</p><div class="mat-flags"><span>${m.sustain>=5?'High sustainability':'Sustainability fit'}</span>${m.perf.leak?`<span>Leak ${m.perf.leak}/5</span>`:''}${m.perf.stack?`<span>Stack ${m.perf.stack}/5</span>`:''}</div><div class="footer-note" style="margin-top:8px">${m.notes}</div>`;el.appendChild(c)}}
+renderCatalog();
+
+const caseFit=[
+ ['Functional requirements','Dish-specific diagnostic maps the case’s food-behaviour problems to packaging performance.','pass'],
+ ['Sustainability','Ranks sustainable PackSwitch material options instead of blanket material substitution.','pass'],
+ ['Cost','Uses the case’s incremental-cost ceiling as a decision gate; demo quotes are clearly labelled.','pass'],
+ ['Customer experience','Scores food-quality and handling effects such as heat, leakage, crispiness, aroma and presentation.','pass'],
+ ['Operational feasibility','Explicit checks for storage/stackability, refrigeration, packing workflow and supplier feasibility.','pass'],
+ ['Scalability','Pilot → measure → validate → phase rollout across 100+ outlets.','pass']
+];
+const caseEl=document.getElementById('caseFit');caseFit.forEach(([a,b,c])=>{const d=document.createElement('div');d.className='case-item';d.innerHTML=`<strong>${a} <span class="pass">✓</span></strong><span>${b}</span>`;caseEl.appendChild(d)});
+
+function evaluatePilot(){
+  const last=window.__last; const maxInc=+(document.getElementById('maxIncrement').value||5); const leak=+document.getElementById('pLeak').value||0; const q=+document.getElementById('pQuality').value||0; const t=+document.getElementById('pTime').value||0; const cx=+document.getElementById('pCx').value||0; const cost=+document.getElementById('pCost').value||0; const orders=+document.getElementById('pOrders').value||0;
+  const gates=[
+   ['Leakage < 3%',leak<3],['Food-quality complaints < 4%',q<4],['Packing time ≤ 45 sec',t<=45],['Customer satisfaction ≥ 4.0/5',cx>=4],['Incremental cost within ceiling',cost<=maxInc],['Pilot sample ≥ 300 orders',orders>=300]
+  ];
+  const passed=gates.filter(x=>x[1]).length, ready=passed===gates.length; document.getElementById('pilotResult').innerHTML=`<div class="candidate" style="background:${ready?'var(--brand-soft)':'var(--warn-soft)'};border-color:${ready?'#cfe8db':'#f0dfb8'}"><div class="cand-top"><div><div class="cand-name">${ready?'SCALE-READY (illustrative gate)':'HOLD / ITERATE BEFORE SCALE'}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${passed}/${gates.length} pilot gates passed across ${orders.toLocaleString()} orders</div></div><div class="score">${Math.round(passed/gates.length*100)}%</div></div><div class="tags">${gates.map(g=>`<span class="tag ${g[1]?'good':'bad'}">${g[1]?'✓':'×'} ${g[0]}</span>`).join('')}</div><div class="footer-note" style="margin-top:8px">${ready?'Strategic action: lock the supplier configuration, document the SOP, and begin phased rollout.':'Strategic action: fix the failed dimensions, rerun the pilot, and do not treat sustainability alone as a pass.'}</div></div>`; flash(ready?'Pilot passes illustrative scale gate':'Pilot needs iteration');
+}
+document.getElementById('evaluatePilotBtn').addEventListener('click',evaluatePilot);
+document.getElementById('demoPilotBtn').addEventListener('click',()=>{document.getElementById('pLeak').value=1.8;document.getElementById('pQuality').value=2.5;document.getElementById('pTime').value=32;document.getElementById('pCx').value=4.3;document.getElementById('pCost').value=3.6;document.getElementById('pOrders').value=500;evaluatePilot()});
+
+const modal=document.getElementById('sourcesModal');document.getElementById('sourcesBtn').addEventListener('click',()=>modal.classList.add('show'));document.getElementById('closeModal').addEventListener('click',()=>modal.classList.remove('show'));modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('show')});
+document.getElementById('printBtn').addEventListener('click',()=>window.print());
+function flash(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove('show'),1900)}
+</script>
+</body>
+</html>
